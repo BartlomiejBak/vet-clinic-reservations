@@ -12,6 +12,7 @@ import pl.bartekbak.vetclinicreservations.repository.VetRepository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,19 +32,21 @@ class VetManagerTest {
 
     private Vet firstVet = Vet.builder()
             .id(1L)
-            .firstName("Firs")
+            .firstName("First")
+            .visits(new ArrayList<>())
             .build();
     private Vet secondVet = Vet.builder()
             .id(2L)
             .firstName("Second")
+            .visits(new ArrayList<>())
             .build();
     private Vet thirdVet = Vet.builder()
             .id(3L)
             .firstName("Third")
+            .visits(new ArrayList<>())
             .build();
 
     private List<Vet> twoVets;
-    private List<Vet> threeVets;
 
     private Visit firstVisit = Visit.builder()
             .id(1L)
@@ -74,8 +77,6 @@ class VetManagerTest {
     @BeforeEach
     void setUp() {
         twoVets = List.of(firstVet, secondVet);
-        threeVets = List.of(firstVet, secondVet, thirdVet);
-
     }
 
     @Test

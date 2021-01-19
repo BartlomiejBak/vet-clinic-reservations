@@ -22,7 +22,24 @@ public class VisitManager {
         return repository.findAll();
     }
 
-    public void addVisit(Visit visit) {
+    public String addVisit(Visit visit) {
+        //check if data is complete
+
+        //check if date is available
+
+        //create pin
+
+        //add to Vet
+
+        //add to Customer
+
+        repository.save(visit);
+        return "pin is: ";
+    }
+
+    public String updateVisit(Visit visit) {
+        //check if data is complete
+
         //check if date is available
 
         //validate id and pin
@@ -32,9 +49,10 @@ public class VisitManager {
         //add to Customer
 
         repository.save(visit);
+        return "Successfully updated";
     }
 
-    public void deleteVisitById(Long id) {
+    public String deleteVisitById(Long id) {
         //check if exist
 
         //validate id and pin
@@ -44,6 +62,7 @@ public class VisitManager {
         //delete from Customer
 
         repository.deleteById(id);
+        return "";
     }
 
     //always true, as neither authentication nor authorization is required
@@ -51,36 +70,12 @@ public class VisitManager {
         return true;
     }
 
-    /*@EventListener(ApplicationReadyEvent.class)
-    private void fillDatabase() {
-        Vet firstVet = Vet.builder()
-                .firstName("Martin")
-                .lastName("Vet")
-                .build();
-        Vet secondVet = Vet.builder()
-                .firstName("Paula")
-                .lastName("Vet")
-                .build();
+    private int createPin(int id) {
+        return 1234;
+    }
 
-        addVisit(Visit.builder()
-                .id(1L)
-                .vet(firstVet)
-                .visitStart(LocalDateTime.of(2021, 5, 15, 11, 30))
-                .build());
-        addVisit(Visit.builder()
-                .id(2L)
-                .vet(secondVet)
-                .visitStart(LocalDateTime.of(2021, 5, 15, 11, 30))
-                .build());
-        addVisit(Visit.builder()
-                .id(3L)
-                .vet(firstVet)
-                .visitStart(LocalDateTime.of(2021, 5, 15, 12, 30))
-                .build());
-        addVisit(Visit.builder()
-                .id(4L)
-                .vet(secondVet)
-                .visitStart(LocalDateTime.of(2021, 5, 15, 12, 30))
-                .build());
-    }*/
+    private String validateVisitData(Visit visit, boolean isUpdate) {
+
+        return "false";
+    }
 }

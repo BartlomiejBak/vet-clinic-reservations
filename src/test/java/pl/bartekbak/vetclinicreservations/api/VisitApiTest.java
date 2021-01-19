@@ -1,5 +1,6 @@
 package pl.bartekbak.vetclinicreservations.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -103,6 +104,28 @@ class VisitApiTest {
     }
 
     @Test
+    void getVetVisitsForDate_shouldReturnVisits() throws Exception {
+        //given
+        when(manager.findVisitsOfVetInDate(anyLong(), any(LocalDate.class))).thenReturn(visits);
+        LocalDate date = LocalDate.of(2021, 05, 04);
+        //when
+        final MvcResult mvcResult = mockMvc
+                .perform(MockMvcRequestBuilders
+                        .get("/api/visits/vet/1?date=2021-05-04")
+                        .content(objectMapper.writeValueAsString(date))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        //then
+        final List<Visit> result = objectMapper
+                .readValue(mvcResult.getResponse().getContentAsByteArray(), new TypeReference<List<Visit>>() {
+                });
+        assertEquals(visits, result);
+        verify(manager, times(1)).findVisitsOfVetInDate(1L, date);
+    }
+
+    @Test
     void addVisit_shouldInvokePostSaveVisitOnce() throws Exception {
         //given
         doNothing().when(manager).addVisit(any(Visit.class));
@@ -143,8 +166,8 @@ class VisitApiTest {
         //when
         final MvcResult mvcResult = mockMvc
                 .perform(MockMvcRequestBuilders
-                .delete("/api/visits?id=1111")
-                .accept(MediaType.APPLICATION_JSON))
+                        .delete("/api/visits?id=1111")
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
         //then

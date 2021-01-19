@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.bartekbak.vetclinicreservations.entity.Visit;
 import pl.bartekbak.vetclinicreservations.manager.VisitManager;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -26,6 +27,11 @@ public class VisitApi {
         return manager.findById(id);
     }
 
+    @GetMapping("/vet/{vetId}")
+    public List<Visit> getVetVisitsForDate(@PathVariable Long vetId, @RequestBody LocalDate date) {
+        return manager.findVisitsOfVetInDate(vetId, date);
+    }
+
     @PostMapping
     public Visit addVisit(@RequestBody Visit visit) {
         visit.setId(0L);
@@ -42,4 +48,6 @@ public class VisitApi {
     public void deleteVisit(@RequestParam Long id) {
         manager.deleteVisitById(id);
     }
+
+
 }

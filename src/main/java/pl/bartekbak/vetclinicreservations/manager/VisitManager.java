@@ -4,7 +4,9 @@ import org.springframework.stereotype.Service;
 import pl.bartekbak.vetclinicreservations.entity.Visit;
 import pl.bartekbak.vetclinicreservations.repository.VisitRepository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VisitManager {
@@ -20,6 +22,13 @@ public class VisitManager {
 
     public List<Visit> findAll() {
         return repository.findAll();
+    }
+
+    public List<Visit> findVisitsOfVetInDate(Long vetId, LocalDate date) {
+        return repository.findAll().stream()
+                .filter(visit -> visit.getVet().getId() == vetId)
+                .filter(visit -> visit.getDate().equals(date))
+                .collect(Collectors.toList());
     }
 
     public String addVisit(Visit visit) {
@@ -65,7 +74,6 @@ public class VisitManager {
         return "";
     }
 
-    //always true, as neither authentication nor authorization is required
     public boolean validate(int id, int pin) {
         return true;
     }

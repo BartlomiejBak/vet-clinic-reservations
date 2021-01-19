@@ -106,6 +106,12 @@ class VisitManagerTest {
     }
     //endregion
 
+    //region findVisitsOfVetInDate
+    public void findVisitsOfVetInDate() {
+        
+    }
+    //endregion
+
     //region addVisit
     @Test
     void addVisit_shouldReturnDateIsUnavailable() {

@@ -28,12 +28,14 @@ public class VisitApi {
 
     @PostMapping
     public Visit addVisit(@RequestBody Visit visit) {
-        return manager.addVisit(visit);
+        visit.setId(0L);
+        manager.addVisit(visit);
+        return visit;
     }
 
     @PutMapping
-    public Visit updateVisit(@RequestBody Visit visit) {
-        return manager.addVisit(visit);
+    public void updateVisit(@RequestBody Visit visit) {
+        manager.addVisit(visit);
     }
 
     @DeleteMapping

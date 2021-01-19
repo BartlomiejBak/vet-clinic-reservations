@@ -65,7 +65,7 @@ class VisitManagerTest {
                 .vet(firstVet)
                 .customerId(1235)
                 .date(LocalDate.of(2020, 5, 5))
-                .time(LocalTime.of(12, 20))
+                .time(LocalTime.of(12, 25))
                 .pin(4568)
                 .build();
         thirdVisit = Visit.builder()
@@ -108,7 +108,7 @@ class VisitManagerTest {
 
     //region findVisitsOfVetInDate
     public void findVisitsOfVetInDate() {
-        
+
     }
     //endregion
 
@@ -116,7 +116,7 @@ class VisitManagerTest {
     @Test
     void addVisit_shouldReturnDateIsUnavailable() {
         //given
-        when(vetManager.checkAvailability(any(Visit.class))).thenReturn(false);
+        firstVet.getVisits().add(secondVisit);
         //when
         String result = manager.addVisit(thirdVisit);
         //then
@@ -129,7 +129,7 @@ class VisitManagerTest {
         Visit fourthVisit = Visit.builder()
                 .customerId(1236)
                 .date(LocalDate.of(2020, 5, 5))
-                .time(LocalTime.of(12, 10))
+                .time(LocalTime.of(12, 40))
                 .build();
         //when
         String result = manager.addVisit(fourthVisit);
@@ -143,7 +143,7 @@ class VisitManagerTest {
         Visit fourthVisit = Visit.builder()
                 .vet(firstVet)
                 .customerId(1236)
-                .time(LocalTime.of(12, 10))
+                .time(LocalTime.of(12, 40))
                 .build();
         //when
         String result = manager.addVisit(fourthVisit);
@@ -171,7 +171,7 @@ class VisitManagerTest {
         Visit fourthVisit = Visit.builder()
                 .vet(firstVet)
                 .date(LocalDate.of(2020, 5, 5))
-                .time(LocalTime.of(12, 10))
+                .time(LocalTime.of(12, 40))
                 .build();
         //when
         String result = manager.addVisit(thirdVisit);
@@ -186,9 +186,8 @@ class VisitManagerTest {
                 .vet(firstVet)
                 .customerId(1236)
                 .date(LocalDate.of(2020, 5, 5))
-                .time(LocalTime.of(12, 10))
+                .time(LocalTime.of(12, 40))
                 .build();
-        when(vetManager.checkAvailability(any(Visit.class))).thenReturn(true);
         //when
         String result = manager.addVisit(thirdVisit);
         //then
@@ -206,7 +205,7 @@ class VisitManagerTest {
                 .vet(firstVet)
                 .customerId(1236)
                 .date(LocalDate.of(2020, 5, 5))
-                .time(LocalTime.of(12, 10))
+                .time(LocalTime.of(12, 40))
                 .pin(4569)
                 .build();
         //when
@@ -223,10 +222,10 @@ class VisitManagerTest {
                 .vet(firstVet)
                 .customerId(1236)
                 .date(LocalDate.of(2020, 5, 5))
-                .time(LocalTime.of(12, 10))
+                .time(LocalTime.of(12, 40))
                 .pin(4569)
                 .build();
-        when(vetManager.checkAvailability(thirdVisit)).thenReturn(false);
+        firstVet.getVisits().add(secondVisit);
         //when
         String result = manager.updateVisit(thirdVisit);
         //then
@@ -240,7 +239,7 @@ class VisitManagerTest {
                 .id(3L)
                 .customerId(1236)
                 .date(LocalDate.of(2020, 5, 5))
-                .time(LocalTime.of(12, 10))
+                .time(LocalTime.of(12, 40))
                 .pin(4569)
                 .build();
         //when
@@ -256,7 +255,7 @@ class VisitManagerTest {
                 .id(3L)
                 .vet(firstVet)
                 .customerId(1236)
-                .time(LocalTime.of(12, 10))
+                .time(LocalTime.of(12, 40))
                 .pin(4569)
                 .build();
         //when
@@ -289,7 +288,7 @@ class VisitManagerTest {
                 .vet(firstVet)
                 .customerId(1236)
                 .date(LocalDate.of(2020, 5, 5))
-                .time(LocalTime.of(12, 10))
+                .time(LocalTime.of(12, 40))
                 .pin(9999999)
                 .build();
         //when
@@ -306,7 +305,7 @@ class VisitManagerTest {
                 .vet(firstVet)
                 .customerId(9991236)
                 .date(LocalDate.of(2020, 5, 5))
-                .time(LocalTime.of(12, 10))
+                .time(LocalTime.of(12, 40))
                 .pin(1324)
                 .build();
         //when
@@ -323,10 +322,9 @@ class VisitManagerTest {
                 .vet(firstVet)
                 .customerId(1236)
                 .date(LocalDate.of(2020, 5, 5))
-                .time(LocalTime.of(12, 10))
+                .time(LocalTime.of(12, 40))
                 .pin(1234)
                 .build();
-        when(vetManager.checkAvailability(thirdVisit)).thenReturn(true);
         //when
         String result = manager.updateVisit(thirdVisit);
         //then

@@ -1,10 +1,12 @@
 package pl.bartekbak.vetclinicreservations.manager;
 
 import org.springframework.stereotype.Service;
+import pl.bartekbak.vetclinicreservations.entity.Vet;
 import pl.bartekbak.vetclinicreservations.entity.Visit;
 import pl.bartekbak.vetclinicreservations.repository.VisitRepository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,7 +76,20 @@ public class VisitManager {
         return "";
     }
 
-    public boolean validate(int id, int pin) {
+    private boolean checkAvailability(Visit visit) {
+        Vet vet = visit.getVet();
+        LocalDate date = visit.getDate();
+        LocalTime time = visit.getTime();
+        LocalTime endOfVisit = time.plusMinutes(visit.getEstimatedVisitDurationMinutes());
+        List<Visit> visits = findVisitsOfVetInDate(vet.getId(), date)
+                .stream()
+                .filter(visit1 -> visit1.getTime().isAfter(endOfVisit)
+                && visit1.getTime().plusMinutes(visit.getEstimatedVisitDurationMinutes()).isBefore(time))
+                .collect(Collectors.toList());
+        return visits.isEmpty();
+    }
+
+    private boolean validate(int id, int pin) {
         return true;
     }
 

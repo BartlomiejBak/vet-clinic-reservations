@@ -33,11 +33,6 @@ public class VetManager {
     }
 
     //todo
-    public boolean checkAvailability(Visit visit) {
-        return false;
-    }
-
-    //todo
     public void addVisit(Visit visit) {
 
     }

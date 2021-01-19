@@ -13,9 +13,11 @@ import java.util.stream.Collectors;
 @Service
 public class VisitManager {
     private VisitRepository repository;
+    private VetManager vetManager;
 
-    public VisitManager(VisitRepository repository) {
+    public VisitManager(VisitRepository repository, VetManager vetManager) {
         this.repository = repository;
+        this.vetManager = vetManager;
     }
 
     public Visit findById(Long id) {
@@ -45,7 +47,7 @@ public class VisitManager {
         //add to Customer
 
         repository.save(visit);
-        return "pin is: ";
+        return "Successfully created";
     }
 
     public String updateVisit(Visit visit) {
@@ -73,7 +75,7 @@ public class VisitManager {
         //delete from Customer
 
         repository.deleteById(id);
-        return "";
+        return "Successfully deleted";
     }
 
     private boolean checkAvailability(Visit visit) {
@@ -89,16 +91,31 @@ public class VisitManager {
         return visits.isEmpty();
     }
 
-    private boolean validate(int id, int pin) {
-        return true;
-    }
-
-    private int createPin(int id) {
-        return 1234;
-    }
-
     private String validateVisitData(Visit visit, boolean isUpdate) {
+        if (visit.getVet() == null) return "You need to choose Vet";
+        if (!checkIfVetExist(visit)) return "No such vet in database";
+        if (visit.getDate() == null) return "You need to specify date";
+        if (visit.getTime() == null) return "You need to specify Time";
+        if (isUpdate && visit.getPin() == null) return "Invalid Pin";
+        if (!CustomerIdExist(visit)) return "Invalid user Id";
 
-        return "false";
+        return "";
+    }
+
+    private boolean validatePin(Visit visit) {
+        return visit.getPin().matches("^[0-9]{4}$");
+    }
+
+    private boolean CustomerIdExist(Visit visit) {
+        return visit.getCustomerId().matches("^[0-9]{4}$");
+    }
+
+    private boolean checkIfVisitIdExist(Visit visit) {
+        return findById(visit.getId()) != null;
+    }
+
+    private boolean checkIfVetExist(Visit visit) {
+        Long id = visit.getVet().getId();
+        return vetManager.findById(id) != null;
     }
 }

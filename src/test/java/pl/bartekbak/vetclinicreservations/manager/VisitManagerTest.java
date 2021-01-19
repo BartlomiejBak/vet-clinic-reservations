@@ -55,26 +55,26 @@ class VisitManagerTest {
         firstVisit = Visit.builder()
                 .id(1L)
                 .vet(firstVet)
-                .customerId(1234)
+                .customerId("1234")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 00))
-                .pin(4567)
+                .pin("4567")
                 .build();
         secondVisit = Visit.builder()
                 .id(2L)
                 .vet(firstVet)
-                .customerId(1235)
+                .customerId("1235")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 25))
-                .pin(4568)
+                .pin("4568")
                 .build();
         thirdVisit = Visit.builder()
                 .id(3L)
                 .vet(firstVet)
-                .customerId(1236)
+                .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 40))
-                .pin(4569)
+                .pin("4569")
                 .build();
 
         firstVet.getVisits().add(firstVisit);
@@ -127,7 +127,7 @@ class VisitManagerTest {
     void addVisit_shouldReturnYouNeedToChooseVet() {
         //given
         Visit fourthVisit = Visit.builder()
-                .customerId(1236)
+                .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 40))
                 .build();
@@ -138,11 +138,27 @@ class VisitManagerTest {
     }
 
     @Test
+    void addVisit_shouldReturnNoSuchVetInDatabase() {
+        //given
+        Visit fourthVisit = Visit.builder()
+                .customerId("1236")
+                .vet(new Vet())
+                .date(LocalDate.of(2020, 5, 5))
+                .time(LocalTime.of(12, 40))
+                .build();
+        when(vetManager.findById(anyLong())).thenReturn(null);
+        //when
+        String result = manager.addVisit(fourthVisit);
+        //then
+        assertEquals("No such vet in database", result);
+    }
+
+    @Test
     void addVisit_shouldReturnYouNeedToSpecifyDate() {
         //given
         Visit fourthVisit = Visit.builder()
                 .vet(firstVet)
-                .customerId(1236)
+                .customerId("1236")
                 .time(LocalTime.of(12, 40))
                 .build();
         //when
@@ -156,7 +172,7 @@ class VisitManagerTest {
         //given
         Visit fourthVisit = Visit.builder()
                 .vet(firstVet)
-                .customerId(1236)
+                .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
                 .build();
         //when
@@ -184,15 +200,14 @@ class VisitManagerTest {
         //given
         Visit fourthVisit = Visit.builder()
                 .vet(firstVet)
-                .customerId(1236)
+                .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 40))
                 .build();
         //when
         String result = manager.addVisit(thirdVisit);
         //then
-        assertEquals("Pin is:", result.substring(0, 6));
-        assertEquals(12, result.length());
+        assertEquals("Successfully created", result);
     }
     //endregion
 
@@ -203,10 +218,10 @@ class VisitManagerTest {
         Visit thirdVisit = Visit.builder()
                 .id(55L)
                 .vet(firstVet)
-                .customerId(1236)
+                .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 40))
-                .pin(4569)
+                .pin("4569")
                 .build();
         //when
         String result = manager.updateVisit(thirdVisit);
@@ -220,10 +235,10 @@ class VisitManagerTest {
         Visit thirdVisit = Visit.builder()
                 .id(3L)
                 .vet(firstVet)
-                .customerId(1236)
+                .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 40))
-                .pin(4569)
+                .pin("4569")
                 .build();
         firstVet.getVisits().add(secondVisit);
         //when
@@ -237,10 +252,10 @@ class VisitManagerTest {
         //given
         Visit thirdVisit = Visit.builder()
                 .id(3L)
-                .customerId(1236)
+                .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 40))
-                .pin(4569)
+                .pin("4569")
                 .build();
         //when
         String result = manager.updateVisit(thirdVisit);
@@ -254,9 +269,9 @@ class VisitManagerTest {
         Visit thirdVisit = Visit.builder()
                 .id(3L)
                 .vet(firstVet)
-                .customerId(1236)
+                .customerId("1236")
                 .time(LocalTime.of(12, 40))
-                .pin(4569)
+                .pin("4569")
                 .build();
         //when
         String result = manager.updateVisit(thirdVisit);
@@ -270,9 +285,9 @@ class VisitManagerTest {
         Visit thirdVisit = Visit.builder()
                 .id(3L)
                 .vet(firstVet)
-                .customerId(1236)
+                .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
-                .pin(4569)
+                .pin("4569")
                 .build();
         //when
         String result = manager.updateVisit(thirdVisit);
@@ -286,10 +301,10 @@ class VisitManagerTest {
         Visit thirdVisit = Visit.builder()
                 .id(3L)
                 .vet(firstVet)
-                .customerId(1236)
+                .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 40))
-                .pin(9999999)
+                .pin("9999999")
                 .build();
         //when
         String result = manager.updateVisit(thirdVisit);
@@ -303,10 +318,10 @@ class VisitManagerTest {
         Visit thirdVisit = Visit.builder()
                 .id(3L)
                 .vet(firstVet)
-                .customerId(9991236)
+                .customerId("9991236")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 40))
-                .pin(1324)
+                .pin("1324")
                 .build();
         //when
         String result = manager.updateVisit(thirdVisit);
@@ -320,16 +335,15 @@ class VisitManagerTest {
         Visit thirdVisit = Visit.builder()
                 .id(3L)
                 .vet(firstVet)
-                .customerId(1236)
+                .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 40))
-                .pin(1234)
+                .pin("1234")
                 .build();
         //when
         String result = manager.updateVisit(thirdVisit);
         //then
-        assertEquals("Visit updated. New pin is: ", result.substring(0,26));
-        assertEquals(31, result.length());
+        assertEquals("Successfully updated", result);
     }
     //endregion
 
@@ -340,10 +354,10 @@ class VisitManagerTest {
         Visit thirdVisit = Visit.builder()
                 .id(3L)
                 .vet(firstVet)
-                .customerId(1236)
+                .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 10))
-                .pin(4569)
+                .pin("4569")
                 .build();
         doNothing().when(repository).deleteById(anyLong());
         //when
@@ -358,10 +372,10 @@ class VisitManagerTest {
         Visit thirdVisit = Visit.builder()
                 .id(15L)
                 .vet(firstVet)
-                .customerId(1236)
+                .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 10))
-                .pin(4569)
+                .pin("4569")
                 .build();
         //when
         String result = manager.deleteVisitById(3L);
@@ -375,10 +389,10 @@ class VisitManagerTest {
         Visit thirdVisit = Visit.builder()
                 .id(3L)
                 .vet(firstVet)
-                .customerId(324234)
+                .customerId("324234")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 10))
-                .pin(4569)
+                .pin("4569")
                 .build();
         //when
         String result = manager.deleteVisitById(3L);
@@ -392,10 +406,10 @@ class VisitManagerTest {
         Visit thirdVisit = Visit.builder()
                 .id(3L)
                 .vet(firstVet)
-                .customerId(1236)
+                .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 10))
-                .pin(999999999)
+                .pin("999999999")
                 .build();
         //when
         String result = manager.deleteVisitById(3L);

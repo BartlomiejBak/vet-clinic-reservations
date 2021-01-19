@@ -19,8 +19,8 @@ public class Visit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int customerId;
-    private int pin;
+    private String customerId;
+    private String pin;
 
     @ManyToOne
     private Vet vet;

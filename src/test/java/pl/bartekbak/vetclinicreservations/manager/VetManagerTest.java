@@ -121,27 +121,6 @@ class VetManagerTest {
     }
 
     @Test
-    void checkAvailability_shouldReturnTrue() {
-        //given
-        firstVet.getVisits().add(firstVisit);
-        //when
-        boolean result = manager.checkAvailability(secondVisit);
-        //then
-        assertTrue(result);
-    }
-
-    @Test
-    void checkAvailability_shouldReturnFalse() {
-        //given
-        firstVet.getVisits().add(firstVisit);
-        firstVet.getVisits().add(secondVisit);
-        //when
-        boolean result = manager.checkAvailability(thirdVisit);
-        //then
-        assertFalse(result);
-    }
-
-    @Test
     void addVisit_shouldAddVisit() {
         //given
         firstVet.getVisits().add(firstVisit);

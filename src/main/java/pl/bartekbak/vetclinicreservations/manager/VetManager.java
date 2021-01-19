@@ -16,7 +16,7 @@ public class VetManager {
         this.repository = repository;
     }
 
-    public Vet findById(int id) {
+    public Vet findById(Long id) {
         return repository.findById(id).orElse(null);
     }
 
@@ -28,7 +28,7 @@ public class VetManager {
         return repository.save(vet);
     }
 
-    public void deleteVetById(int id) {
+    public void deleteVetById(Long id) {
         repository.deleteById(id);
     }
 

@@ -41,7 +41,7 @@ class VisitApiTest {
     private ObjectMapper objectMapper;
 
     private Vet firstVet = Vet.builder()
-            .id(1)
+            .id(1L)
             .build();
 
     private Visit firstVisit = Visit.builder()

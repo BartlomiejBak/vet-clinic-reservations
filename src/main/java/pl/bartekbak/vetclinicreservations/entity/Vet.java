@@ -16,7 +16,7 @@ import java.util.List;
 public class Vet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     private String firstName;
     private String lastName;
     @OneToMany

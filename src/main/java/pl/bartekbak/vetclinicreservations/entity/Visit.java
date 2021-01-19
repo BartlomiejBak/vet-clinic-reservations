@@ -1,12 +1,9 @@
 package pl.bartekbak.vetclinicreservations.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
@@ -23,11 +20,14 @@ public class Visit {
     private Long id;
 
     private int customerId;
+    private int pin;
 
     @ManyToOne
     private Vet vet;
 
     private LocalDate date;
     private LocalTime time;
+
+    private int estimatedVisitDurationMinutes = 20;
 
 }

@@ -2,7 +2,6 @@ package pl.bartekbak.vetclinicreservations.manager;
 
 import org.springframework.stereotype.Service;
 import pl.bartekbak.vetclinicreservations.entity.Vet;
-import pl.bartekbak.vetclinicreservations.entity.Visit;
 import pl.bartekbak.vetclinicreservations.repository.VetRepository;
 
 import java.util.List;
@@ -32,8 +31,4 @@ public class VetManager {
         repository.deleteById(id);
     }
 
-    //todo
-    public void addVisit(Visit visit) {
-
-    }
 }

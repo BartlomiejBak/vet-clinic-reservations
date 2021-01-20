@@ -41,12 +41,12 @@ public class VisitApi {
 
     @PutMapping
     public void updateVisit(@RequestBody Visit visit) {
-        manager.addVisit(visit);
+        manager.updateVisit(visit);
     }
 
     @DeleteMapping
-    public void deleteVisit(@RequestParam Long id) {
-        manager.deleteVisitById(id);
+    public void deleteVisit(@RequestBody Visit visit) {
+        manager.deleteVisit(visit);
     }
 
 

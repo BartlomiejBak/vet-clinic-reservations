@@ -19,8 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class VisitManagerTest {
@@ -150,6 +149,7 @@ class VisitManagerTest {
                 .vet(Vet.builder().id(900L).build())
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 40))
+                .pin("1345")
                 .build();
         when(vetManager.findById(anyLong())).thenReturn(null);
         //when
@@ -193,24 +193,27 @@ class VisitManagerTest {
                 .vet(firstVet)
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 40))
+                .pin("1245")
                 .build();
         //when
-        String result = manager.addVisit(thirdVisit);
+        String result = manager.addVisit(fourthVisit);
         //then
-        assertEquals("Invalid user", result);
+        assertEquals("Invalid user Id", result);
     }
 
     @Test
-    void addVisit_shouldReturnPin() {
+    void addVisit_shouldReturnSuccessfullyCreated() {
         //given
         Visit fourthVisit = Visit.builder()
                 .vet(firstVet)
                 .customerId("1236")
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 40))
+                .pin("4567")
                 .build();
+        when(vetManager.findById(anyLong())).thenReturn(firstVet);
         //when
-        String result = manager.addVisit(thirdVisit);
+        String result = manager.addVisit(fourthVisit);
         //then
         assertEquals("Successfully created", result);
     }
@@ -229,7 +232,7 @@ class VisitManagerTest {
                 .pin("4569")
                 .build();
         when(vetManager.findById(anyLong())).thenReturn(firstVet);
-        when(repository.findById(anyLong())).thenReturn(Optional.of(thirdVisit));
+        when(repository.findById(anyLong())).thenThrow(new RuntimeException("Id not found"));
         //when
         String result = manager.updateVisit(thirdVisit);
         //then
@@ -248,7 +251,8 @@ class VisitManagerTest {
                 .pin("4569")
                 .build();
         when(vetManager.findById(anyLong())).thenReturn(firstVet);
-        when(repository.findById(anyLong())).thenReturn(Optional.of(thirdVisit));
+        when(repository.findById(anyLong())).thenReturn(Optional.of(firstVisit));
+        when(repository.findAll()).thenReturn(visits);
         //when
         String result = manager.updateVisit(thirdVisit);
         //then
@@ -348,7 +352,8 @@ class VisitManagerTest {
                 .time(LocalTime.of(12, 40))
                 .pin("1234")
                 .build();
-
+        when(vetManager.findById(anyLong())).thenReturn(firstVet);
+        when(repository.findById(anyLong())).thenReturn(Optional.of(thirdVisit));
         //when
         String result = manager.updateVisit(thirdVisit);
         //then
@@ -365,29 +370,33 @@ class VisitManagerTest {
                 .vet(firstVet)
                 .customerId("1236")
                 .date(LocalDate.of(2021, 5, 5))
-                .time(LocalTime.of(12, 10))
-                .pin("4569")
+                .time(LocalTime.of(12, 40))
+                .pin("1234")
                 .build();
-        doNothing().when(repository).deleteById(anyLong());
+        doNothing().when(repository).delete(any(Visit.class));
+        when(vetManager.findById(anyLong())).thenReturn(firstVet);
+        when(repository.findById(anyLong())).thenReturn(Optional.of(thirdVisit));
         //when
-        String result = manager.deleteVisitById(3L);
+        String result = manager.deleteVisit(thirdVisit);
         //then
         assertEquals("Successfully deleted", result);
+        verify(repository, times(1)).delete(thirdVisit);
     }
 
     @Test
     void deleteVisitById_shouldReturnNoSuchVisitInDatabase() {
         //given
         Visit thirdVisit = Visit.builder()
-                .id(15L)
+                .id(50L)
                 .vet(firstVet)
                 .customerId("1236")
                 .date(LocalDate.of(2021, 5, 5))
-                .time(LocalTime.of(12, 10))
-                .pin("4569")
+                .time(LocalTime.of(12, 40))
+                .pin("1234")
                 .build();
+        when(vetManager.findById(anyLong())).thenReturn(firstVet);
         //when
-        String result = manager.deleteVisitById(3L);
+        String result = manager.deleteVisit(thirdVisit);
         //then
         assertEquals("No such visit in database", result);
     }
@@ -398,13 +407,13 @@ class VisitManagerTest {
         Visit thirdVisit = Visit.builder()
                 .id(3L)
                 .vet(firstVet)
-                .customerId("324234")
+                .customerId("12367")
                 .date(LocalDate.of(2021, 5, 5))
-                .time(LocalTime.of(12, 10))
-                .pin("4569")
+                .time(LocalTime.of(12, 40))
+                .pin("1234")
                 .build();
         //when
-        String result = manager.deleteVisitById(3L);
+        String result = manager.deleteVisit(thirdVisit);
         //then
         assertEquals("Invalid user Id", result);
     }
@@ -417,11 +426,11 @@ class VisitManagerTest {
                 .vet(firstVet)
                 .customerId("1236")
                 .date(LocalDate.of(2021, 5, 5))
-                .time(LocalTime.of(12, 10))
-                .pin("999999999")
+                .time(LocalTime.of(12, 40))
+                .pin("12545")
                 .build();
         //when
-        String result = manager.deleteVisitById(3L);
+        String result = manager.deleteVisit(thirdVisit);
         //then
         assertEquals("Invalid Pin", result);
     }

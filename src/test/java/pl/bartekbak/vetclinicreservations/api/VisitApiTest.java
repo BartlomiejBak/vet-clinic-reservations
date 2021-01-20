@@ -128,7 +128,7 @@ class VisitApiTest {
     @Test
     void addVisit_shouldInvokePostSaveVisitOnce() throws Exception {
         //given
-        doNothing().when(manager).addVisit(any(Visit.class));
+        when(manager.addVisit(any(Visit.class))).thenReturn("ok");
         //when
         final MvcResult mvcResult = mockMvc
                 .perform(MockMvcRequestBuilders
@@ -145,7 +145,7 @@ class VisitApiTest {
     @Test
     void updateVisit_shouldInvokePutSaveVisitOnce() throws Exception {
         //given
-        doNothing().when(manager).addVisit(any(Visit.class));
+        when(manager.updateVisit(any(Visit.class))).thenReturn("ok");
         //when
         final MvcResult mvcResult = mockMvc
                 .perform(MockMvcRequestBuilders
@@ -156,21 +156,23 @@ class VisitApiTest {
                 .andExpect(status().isOk())
                 .andReturn();
         //then
-        verify(manager, times(1)).addVisit(any(Visit.class));
+        verify(manager, times(1)).updateVisit(any(Visit.class));
     }
 
     @Test
     void deleteVisit() throws Exception {
         //given
-        doNothing().when(manager).deleteVisitById(anyLong());
+        when(manager.deleteVisit(any(Visit.class))).thenReturn("ok");
         //when
         final MvcResult mvcResult = mockMvc
                 .perform(MockMvcRequestBuilders
-                        .delete("/api/visits?id=1111")
+                        .delete("/api/visits")
+                        .content(objectMapper.writeValueAsString(firstVisit))
+                        .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
         //then
-        verify(manager, times(1)).deleteVisitById(anyLong());
+        verify(manager, times(1)).deleteVisit(any(Visit.class));
     }
 }

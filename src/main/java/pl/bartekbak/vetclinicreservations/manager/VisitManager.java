@@ -8,6 +8,7 @@ import pl.bartekbak.vetclinicreservations.repository.VisitRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,7 +22,14 @@ public class VisitManager {
     }
 
     public Visit findById(Long id) {
-        return repository.findById(id).orElse(null);
+        Optional<Visit> result = repository.findById(id);
+        Visit visit = null;
+        if (result.isPresent()) {
+            visit = result.get();
+        } else {
+            throw new RuntimeException("Id not found");
+        }
+        return visit;
     }
 
     public List<Visit> findAll() {
@@ -37,8 +45,8 @@ public class VisitManager {
 
     public String addVisit(Visit visit) {
         //check if data is complete
-        String dataCompletion = validateVisitData(visit, false);
-        if (!dataCompletion.isEmpty()) return dataCompletion;
+        String dataCompletion = validateVisitData(visit);
+        if (!dataCompletion.equals("")) return dataCompletion;
 
         //check if date is available
         if (checkAvailability(visit)) {
@@ -50,29 +58,28 @@ public class VisitManager {
 
     public String updateVisit(Visit visit) {
         //check if data is complete
-        String dataCompletion = validateVisitData(visit, true);
+        String dataCompletion = validateVisitData(visit);
         if (!dataCompletion.isEmpty()) return dataCompletion;
         //check if visit exist
         if (!checkIfVisitIdExist(visit)) return "No such visit in database";
         //check if date is available
         if (checkAvailability(visit)) {
             repository.save(visit);
-            return "Successfully created";
+            return "Successfully updated";
         }
         return "Date is unavailable";
     }
 
-    public String deleteVisitById(Long id) {
+    public String deleteVisit(Visit visit) {
+        //check if data is complete
+        String dataCompletion = validateVisitData(visit);
+        if (!dataCompletion.isEmpty()) return dataCompletion;
         //check if exist
-
-        //validate id and pin
-
-        //delete from Vet
-
-        //delete from Customer
-
-        repository.deleteById(id);
-        return "Successfully deleted";
+        if (checkIfVisitIdExist(visit)) {
+            repository.delete(visit);
+            return "Successfully deleted";
+        }
+        return "No such visit in database";
     }
 
     private boolean checkAvailability(Visit visit) {
@@ -90,21 +97,21 @@ public class VisitManager {
         return visits.isEmpty();
     }
 
-    private boolean pointOfTimeIsBeetween(LocalTime point, LocalTime start, LocalTime end) {
+    private boolean pointOfTimeIsBetween(LocalTime point, LocalTime start, LocalTime end) {
         return start.isBefore(point) && end.isAfter(point);
     }
 
     private boolean periodIsColliding(LocalTime begin, int duration, LocalTime reference, int refDuration) {
-        return pointOfTimeIsBeetween(begin, reference, reference.plusMinutes(refDuration))
-                || pointOfTimeIsBeetween(begin.plusMinutes(duration), reference, reference.plusMinutes(refDuration));
+        return pointOfTimeIsBetween(begin, reference, reference.plusMinutes(refDuration))
+                || pointOfTimeIsBetween(begin.plusMinutes(duration), reference, reference.plusMinutes(refDuration));
     }
 
-    private String validateVisitData(Visit visit, boolean isUpdate) {
+    private String validateVisitData(Visit visit) {
         if (visit.getVet() == null) return "You need to choose Vet";
         if (visit.getDate() == null) return "You need to specify date";
         if (visit.getTime() == null) return "You need to specify Time";
-        if (isUpdate && !validatePin(visit)) return "Invalid Pin";
-        if (!CustomerIdExist(visit)) return "Invalid user Id";
+        if (visit.getPin() == null || !validatePin(visit)) return "Invalid Pin";
+        if (visit.getCustomerId() == null || !CustomerIdExist(visit)) return "Invalid user Id";
         if (!checkIfVetExist(visit)) return "No such vet in database";
 
         return "";
@@ -119,7 +126,12 @@ public class VisitManager {
     }
 
     private boolean checkIfVisitIdExist(Visit visit) {
-        return findById(visit.getId()) != null;
+        try {
+            findById(visit.getId());
+            return true;
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 
     private boolean checkIfVetExist(Visit visit) {

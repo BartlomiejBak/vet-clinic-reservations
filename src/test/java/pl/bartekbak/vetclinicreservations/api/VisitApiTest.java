@@ -111,7 +111,7 @@ class VisitApiTest {
         //when
         final MvcResult mvcResult = mockMvc
                 .perform(MockMvcRequestBuilders
-                        .get("/api/visits/vet/1?date=2021-05-04")
+                        .get("/api/visits/vet/1")
                         .content(objectMapper.writeValueAsString(date))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))

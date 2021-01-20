@@ -10,7 +10,4 @@ public class VetClinicReservationsApplication {
         SpringApplication.run(VetClinicReservationsApplication.class, args);
     }
 
-    public static void init() {
-
-    }
 }

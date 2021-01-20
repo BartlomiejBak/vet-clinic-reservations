@@ -1,7 +1,6 @@
 package pl.bartekbak.vetclinicreservations.manager;
 
 import org.springframework.stereotype.Service;
-import pl.bartekbak.vetclinicreservations.entity.Vet;
 import pl.bartekbak.vetclinicreservations.entity.Visit;
 import pl.bartekbak.vetclinicreservations.repository.VisitRepository;
 
@@ -37,6 +36,7 @@ public class VisitManager {
     }
 
     public List<Visit> findVisitsOfVetInDate(Long vetId, LocalDate date) {
+
         return repository.findAll().stream()
                 .filter(visit -> visit.getVet().getId() == vetId)
                 .filter(visit -> visit.getDate().isEqual(date))
@@ -49,11 +49,10 @@ public class VisitManager {
         if (!dataCompletion.equals("")) return dataCompletion;
 
         //check if date is available
-        if (checkAvailability(visit)) {
-            repository.save(visit);
-            return "Successfully created";
-        }
-        return "Date is unavailable";
+        if (!checkAvailability(visit)) return "Date is unavailable";
+
+        repository.save(visit);
+        return "Successfully created";
     }
 
     public String updateVisit(Visit visit) {
@@ -63,11 +62,9 @@ public class VisitManager {
         //check if visit exist
         if (!checkIfVisitIdExist(visit)) return "No such visit in database";
         //check if date is available
-        if (checkAvailability(visit)) {
-            repository.save(visit);
-            return "Successfully updated";
-        }
-        return "Date is unavailable";
+        if (!checkAvailability(visit)) return "Date is unavailable";
+        repository.save(visit);
+        return "Successfully updated";
     }
 
     public String deleteVisit(Visit visit) {
@@ -82,28 +79,27 @@ public class VisitManager {
         return "No such visit in database";
     }
 
-    private boolean checkAvailability(Visit visit) {
-        Vet vet = visit.getVet();
-
-        LocalDate date = visit.getDate();
-        LocalTime startOfVisit = visit.getTime();
-        int duration = visit.getVisitDurationMinutes();
-
-        List<Visit> visits = findVisitsOfVetInDate(vet.getId(), date)
+    private boolean checkAvailability(Visit newVisit) {
+        List<Visit> visitsFiltered = findVisitsOfVetInDate(newVisit.getVet().getId(), newVisit.getDate())
                 .stream()
-                .filter(visit1 ->
-                        periodIsColliding(startOfVisit, duration, visit1.getTime(), visit1.getVisitDurationMinutes()))
+                .filter(visit -> timeCollision(newVisit, visit) == true)
+                .filter(visit -> visit.getId() != newVisit.getId())
                 .collect(Collectors.toList());
-        return visits.isEmpty();
+
+        return visitsFiltered.isEmpty();
     }
 
-    private boolean pointOfTimeIsBetween(LocalTime point, LocalTime start, LocalTime end) {
-        return start.isBefore(point) && end.isAfter(point);
-    }
+    private boolean timeCollision(Visit newVisit, Visit oldVisit) {
+        LocalTime oldStart = oldVisit.getTime();
+        LocalTime oldEnd = oldStart.plusMinutes(oldVisit.getVisitDurationMinutes());
 
-    private boolean periodIsColliding(LocalTime begin, int duration, LocalTime reference, int refDuration) {
-        return pointOfTimeIsBetween(begin, reference, reference.plusMinutes(refDuration))
-                || pointOfTimeIsBetween(begin.plusMinutes(duration), reference, reference.plusMinutes(refDuration));
+        LocalTime newStart = newVisit.getTime();
+        LocalTime newEnd = newStart.plusMinutes(newVisit.getVisitDurationMinutes());
+
+        return newStart.isAfter(oldStart) && newStart.isBefore(oldEnd)
+                || newEnd.isAfter(oldStart) && newEnd.isBefore(oldEnd)
+                || newStart.isBefore(oldStart) && newEnd.isAfter(oldEnd)
+                || newStart.equals(oldStart) || newEnd.equals(oldEnd);
     }
 
     private String validateVisitData(Visit visit) {

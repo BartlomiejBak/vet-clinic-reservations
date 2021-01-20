@@ -13,21 +13,20 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Data
 @Entity
+@Table(name = "visits")
 public class Visit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String customerId;
     private String pin;
-
     @ManyToOne
+    @JoinColumn(name = "vet_id")
     private Vet vet;
-
     private LocalDate date;
     private LocalTime time;
-
-    private final int visitDurationMinutes = 20;
+    @Builder.Default
+    private int visitDurationMinutes = 20;
 
 }

@@ -33,20 +33,19 @@ public class VisitApi {
     }
 
     @PostMapping
-    public Visit addVisit(@RequestBody Visit visit) {
+    public String addVisit(@RequestBody Visit visit) {
         visit.setId(0L);
-        manager.addVisit(visit);
-        return visit;
+        return manager.addVisit(visit);
     }
 
     @PutMapping
-    public void updateVisit(@RequestBody Visit visit) {
-        manager.updateVisit(visit);
+    public String updateVisit(@RequestBody Visit visit) {
+        return manager.updateVisit(visit);
     }
 
     @DeleteMapping
-    public void deleteVisit(@RequestBody Visit visit) {
-        manager.deleteVisit(visit);
+    public String deleteVisit(@RequestBody Visit visit) {
+        return manager.deleteVisit(visit);
     }
 
 

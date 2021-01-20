@@ -31,23 +31,23 @@ public class VisitManager {
     public List<Visit> findVisitsOfVetInDate(Long vetId, LocalDate date) {
         return repository.findAll().stream()
                 .filter(visit -> visit.getVet().getId() == vetId)
-                .filter(visit -> visit.getDate().equals(date))
+                .filter(visit -> visit.getDate().isEqual(date))
                 .collect(Collectors.toList());
     }
 
     public String addVisit(Visit visit) {
         //check if data is complete
+        String dataCompletion = validateVisitData(visit, false);
+        if (!dataCompletion.isEmpty()) return dataCompletion;
 
         //check if date is available
-
-        //create pin
-
-        //add to Vet
-
-        //add to Customer
-
-        repository.save(visit);
-        return "Successfully created";
+        if (checkAvailability(visit)) {
+            vetManager.addVisit(visit);
+            repository.save(visit);
+            return "Successfully created";
+        } else {
+            return "Date is unavailable";
+        }
     }
 
     public String updateVisit(Visit visit) {
@@ -80,24 +80,35 @@ public class VisitManager {
 
     private boolean checkAvailability(Visit visit) {
         Vet vet = visit.getVet();
+
         LocalDate date = visit.getDate();
-        LocalTime time = visit.getTime();
-        LocalTime endOfVisit = time.plusMinutes(visit.getEstimatedVisitDurationMinutes());
+        LocalTime startOfVisit = visit.getTime();
+        int duration = visit.getVisitDurationMinutes();
+
         List<Visit> visits = findVisitsOfVetInDate(vet.getId(), date)
                 .stream()
-                .filter(visit1 -> visit1.getTime().isAfter(endOfVisit)
-                && visit1.getTime().plusMinutes(visit.getEstimatedVisitDurationMinutes()).isBefore(time))
+                .filter(visit1 ->
+                        periodIsColliding(startOfVisit, duration, visit1.getTime(), visit1.getVisitDurationMinutes()))
                 .collect(Collectors.toList());
         return visits.isEmpty();
     }
 
+    private boolean pointOfTimeIsBeetween(LocalTime point, LocalTime start, LocalTime end) {
+        return start.isBefore(point) && end.isAfter(point);
+    }
+
+    private boolean periodIsColliding(LocalTime begin, int duration, LocalTime reference, int refDuration) {
+        return pointOfTimeIsBeetween(begin, reference, reference.plusMinutes(refDuration))
+                || pointOfTimeIsBeetween(begin.plusMinutes(duration), reference, reference.plusMinutes(refDuration));
+    }
+
     private String validateVisitData(Visit visit, boolean isUpdate) {
         if (visit.getVet() == null) return "You need to choose Vet";
-        if (!checkIfVetExist(visit)) return "No such vet in database";
         if (visit.getDate() == null) return "You need to specify date";
         if (visit.getTime() == null) return "You need to specify Time";
-        if (isUpdate && visit.getPin() == null) return "Invalid Pin";
+        if (isUpdate && !validatePin(visit)) return "Invalid Pin";
         if (!CustomerIdExist(visit)) return "Invalid user Id";
+        if (!checkIfVetExist(visit)) return "No such vet in database";
 
         return "";
     }
@@ -115,6 +126,7 @@ public class VisitManager {
     }
 
     private boolean checkIfVetExist(Visit visit) {
+        if (visit.getVet() == null || visit.getVet().getId() == null) return false;
         Long id = visit.getVet().getId();
         return vetManager.findById(id) != null;
     }

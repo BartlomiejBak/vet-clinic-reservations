@@ -33,17 +33,14 @@ class VetManagerTest {
     private Vet firstVet = Vet.builder()
             .id(1L)
             .firstName("First")
-            .visits(new ArrayList<>())
             .build();
     private Vet secondVet = Vet.builder()
             .id(2L)
             .firstName("Second")
-            .visits(new ArrayList<>())
             .build();
     private Vet thirdVet = Vet.builder()
             .id(3L)
             .firstName("Third")
-            .visits(new ArrayList<>())
             .build();
 
     private List<Vet> twoVets;
@@ -51,26 +48,26 @@ class VetManagerTest {
     private Visit firstVisit = Visit.builder()
             .id(1L)
             .vet(firstVet)
-            .customerId(1234)
+            .customerId("1234")
             .date(LocalDate.of(2020, 5, 5))
             .time(LocalTime.of(12, 00))
-            .pin(4567)
+            .pin("4567")
             .build();
     private Visit secondVisit = Visit.builder()
             .id(2L)
             .vet(firstVet)
-            .customerId(1235)
+            .customerId("1235")
             .date(LocalDate.of(2020, 5, 5))
             .time(LocalTime.of(12, 20))
-            .pin(4568)
+            .pin("4568")
             .build();
     private Visit thirdVisit = Visit.builder()
             .id(3L)
             .vet(firstVet)
-            .customerId(1236)
+            .customerId("1236")
             .date(LocalDate.of(2020, 5, 5))
             .time(LocalTime.of(12, 10))
-            .pin(4569)
+            .pin("4569")
             .build();
 
 
@@ -120,13 +117,4 @@ class VetManagerTest {
         verify(repository, times(1)).deleteById(1L);
     }
 
-    @Test
-    void addVisit_shouldAddVisit() {
-        //given
-        firstVet.getVisits().add(firstVisit);
-        //when
-        manager.addVisit(secondVisit);
-        //then
-        assertEquals(2, firstVet.getVisits().size());
-    }
 }

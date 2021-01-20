@@ -28,6 +28,6 @@ public class Visit {
     private LocalDate date;
     private LocalTime time;
 
-    private int estimatedVisitDurationMinutes = 20;
+    private final int visitDurationMinutes = 20;
 
 }

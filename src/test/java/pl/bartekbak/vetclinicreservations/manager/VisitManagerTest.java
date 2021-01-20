@@ -41,22 +41,20 @@ class VisitManagerTest {
     private Visit thirdVisit;
 
     List<Visit> visits;
-    List<Visit> enhancedVisits;
 
     //region setup
     @BeforeEach
     void setUp() {
         firstVet = Vet.builder()
                 .id(1L)
-                .firstName("Firs")
-                .visits(new ArrayList<>())
+                .firstName("First")
                 .build();
 
         firstVisit = Visit.builder()
                 .id(1L)
                 .vet(firstVet)
                 .customerId("1234")
-                .date(LocalDate.of(2020, 5, 5))
+                .date(LocalDate.of(2021, 5, 5))
                 .time(LocalTime.of(12, 00))
                 .pin("4567")
                 .build();
@@ -64,7 +62,7 @@ class VisitManagerTest {
                 .id(2L)
                 .vet(firstVet)
                 .customerId("1235")
-                .date(LocalDate.of(2020, 5, 5))
+                .date(LocalDate.of(2021, 5, 5))
                 .time(LocalTime.of(12, 25))
                 .pin("4568")
                 .build();
@@ -72,12 +70,11 @@ class VisitManagerTest {
                 .id(3L)
                 .vet(firstVet)
                 .customerId("1236")
-                .date(LocalDate.of(2020, 5, 5))
+                .date(LocalDate.of(2021, 5, 5))
                 .time(LocalTime.of(12, 40))
                 .pin("4569")
                 .build();
 
-        firstVet.getVisits().add(firstVisit);
         visits = List.of(firstVisit, secondVisit);
     }
     //endregion
@@ -107,8 +104,15 @@ class VisitManagerTest {
     //endregion
 
     //region findVisitsOfVetInDate
-    public void findVisitsOfVetInDate() {
-
+    @Test
+    void findVisitsOfVetInDate() {
+        //given
+        when(repository.findAll()).thenReturn(visits);
+        LocalDate date = LocalDate.of(2021, 5, 5);
+        //when
+        List<Visit> result = manager.findVisitsOfVetInDate(1L, date);
+        //then
+        assertEquals(2, result.size());
     }
     //endregion
 
@@ -116,7 +120,8 @@ class VisitManagerTest {
     @Test
     void addVisit_shouldReturnDateIsUnavailable() {
         //given
-        firstVet.getVisits().add(secondVisit);
+        when(repository.findAll()).thenReturn(visits);
+        when(vetManager.findById(anyLong())).thenReturn(firstVet);
         //when
         String result = manager.addVisit(thirdVisit);
         //then
@@ -142,7 +147,7 @@ class VisitManagerTest {
         //given
         Visit fourthVisit = Visit.builder()
                 .customerId("1236")
-                .vet(new Vet())
+                .vet(Vet.builder().id(900L).build())
                 .date(LocalDate.of(2020, 5, 5))
                 .time(LocalTime.of(12, 40))
                 .build();
@@ -240,7 +245,6 @@ class VisitManagerTest {
                 .time(LocalTime.of(12, 40))
                 .pin("4569")
                 .build();
-        firstVet.getVisits().add(secondVisit);
         //when
         String result = manager.updateVisit(thirdVisit);
         //then

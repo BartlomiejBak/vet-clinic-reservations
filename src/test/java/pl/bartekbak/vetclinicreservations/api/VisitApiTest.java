@@ -17,6 +17,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.bartekbak.vetclinicreservations.entity.Vet;
 import pl.bartekbak.vetclinicreservations.entity.Visit;
+import pl.bartekbak.vetclinicreservations.exceptions.DataCollisionException;
+import pl.bartekbak.vetclinicreservations.exceptions.IncompleteDataException;
+import pl.bartekbak.vetclinicreservations.exceptions.InvalidCredentialsException;
+import pl.bartekbak.vetclinicreservations.exceptions.ResourceNotFoundException;
+import pl.bartekbak.vetclinicreservations.manager.RestResponseExceptionHandler;
 import pl.bartekbak.vetclinicreservations.manager.VisitManager;
 
 import java.time.LocalDate;
@@ -62,7 +67,9 @@ class VisitApiTest {
     @BeforeEach
     void setUp() {
         visits = List.of(firstVisit, secondVisit);
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new RestResponseExceptionHandler())
+                .build();
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
     }
@@ -154,6 +161,74 @@ class VisitApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andReturn();
+        //then
+        verify(manager, times(1)).updateVisit(any(Visit.class));
+    }
+
+    @Test
+    void updateVisit_shouldInvokePutSaveVisitOnceAndReturn400Status() throws Exception {
+        //given
+        when(manager.updateVisit(any(Visit.class))).thenThrow(IncompleteDataException.class);
+        //when
+        final MvcResult mvcResult = mockMvc
+                .perform(MockMvcRequestBuilders
+                        .put("/api/visits")
+                        .content(objectMapper.writeValueAsString(firstVisit))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(400))
+                .andReturn();
+        //then
+        verify(manager, times(1)).updateVisit(any(Visit.class));
+    }
+
+@Test
+    void updateVisit_shouldInvokePutSaveVisitOnceAndReturn401Status() throws Exception {
+        //given
+        when(manager.updateVisit(any(Visit.class))).thenThrow(InvalidCredentialsException.class);
+        //when
+        final MvcResult mvcResult = mockMvc
+                .perform(MockMvcRequestBuilders
+                        .put("/api/visits")
+                        .content(objectMapper.writeValueAsString(firstVisit))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(401))
+                .andReturn();
+        //then
+        verify(manager, times(1)).updateVisit(any(Visit.class));
+    }
+
+@Test
+    void updateVisit_shouldInvokePutSaveVisitOnceAndReturn404Status() throws Exception {
+        //given
+        when(manager.updateVisit(any(Visit.class))).thenThrow(ResourceNotFoundException.class);
+        //when
+        final MvcResult mvcResult = mockMvc
+                .perform(MockMvcRequestBuilders
+                        .put("/api/visits")
+                        .content(objectMapper.writeValueAsString(firstVisit))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(404))
+                .andReturn();
+        //then
+        verify(manager, times(1)).updateVisit(any(Visit.class));
+    }
+
+@Test
+    void updateVisit_shouldInvokePutSaveVisitOnceAndReturn409Status() throws Exception {
+        //given
+        when(manager.updateVisit(any(Visit.class))).thenThrow(DataCollisionException.class);
+        //when
+        final MvcResult mvcResult = mockMvc
+                .perform(MockMvcRequestBuilders
+                        .put("/api/visits")
+                        .content(objectMapper.writeValueAsString(firstVisit))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(409))
                 .andReturn();
         //then
         verify(manager, times(1)).updateVisit(any(Visit.class));

@@ -2,9 +2,11 @@ package pl.bartekbak.vetclinicreservations.manager;
 
 import org.springframework.stereotype.Service;
 import pl.bartekbak.vetclinicreservations.entity.Vet;
+import pl.bartekbak.vetclinicreservations.exceptions.ResourceNotFoundException;
 import pl.bartekbak.vetclinicreservations.repository.VetRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VetManager {
@@ -16,7 +18,14 @@ public class VetManager {
     }
 
     public Vet findById(Long id) {
-        return repository.findById(id).orElse(null);
+        Optional<Vet> result = repository.findById(id);
+        Vet vet;
+        if (result.isPresent()) {
+            vet = result.get();
+        } else {
+            throw new ResourceNotFoundException("Id not found");
+        }
+        return vet;
     }
 
     public List<Vet> findAll() {

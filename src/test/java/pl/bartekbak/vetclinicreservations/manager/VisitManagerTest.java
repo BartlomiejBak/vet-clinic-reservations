@@ -8,6 +8,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.bartekbak.vetclinicreservations.entity.Vet;
 import pl.bartekbak.vetclinicreservations.entity.Visit;
+import pl.bartekbak.vetclinicreservations.exceptions.DataCollisionException;
+import pl.bartekbak.vetclinicreservations.exceptions.IncompleteDataException;
+import pl.bartekbak.vetclinicreservations.exceptions.InvalidCredentialsException;
+import pl.bartekbak.vetclinicreservations.exceptions.ResourceNotFoundException;
 import pl.bartekbak.vetclinicreservations.repository.VisitRepository;
 
 import java.time.LocalDate;
@@ -17,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -122,9 +127,8 @@ class VisitManagerTest {
         when(repository.findAll()).thenReturn(visits);
         when(vetManager.findById(anyLong())).thenReturn(firstVet);
         //when
-        String result = manager.addVisit(thirdVisit);
         //then
-        assertEquals("Date is unavailable", result);
+        assertThrows(DataCollisionException.class, () -> manager.addVisit(thirdVisit));
     }
 
     @Test
@@ -136,9 +140,8 @@ class VisitManagerTest {
                 .time(LocalTime.of(12, 40))
                 .build();
         //when
-        String result = manager.addVisit(fourthVisit);
         //then
-        assertEquals("You need to choose Vet", result);
+        assertThrows(IncompleteDataException.class, () -> manager.addVisit(fourthVisit));
     }
 
     @Test
@@ -153,9 +156,8 @@ class VisitManagerTest {
                 .build();
         when(vetManager.findById(anyLong())).thenReturn(null);
         //when
-        String result = manager.addVisit(fourthVisit);
         //then
-        assertEquals("No such vet in database", result);
+        assertThrows(ResourceNotFoundException.class, () -> manager.addVisit(fourthVisit));
     }
 
     @Test
@@ -167,9 +169,8 @@ class VisitManagerTest {
                 .time(LocalTime.of(12, 40))
                 .build();
         //when
-        String result = manager.addVisit(fourthVisit);
         //then
-        assertEquals("You need to specify date", result);
+        assertThrows(IncompleteDataException.class, () -> manager.addVisit(fourthVisit));
     }
 
     @Test
@@ -181,9 +182,8 @@ class VisitManagerTest {
                 .date(LocalDate.of(2020, 5, 5))
                 .build();
         //when
-        String result = manager.addVisit(fourthVisit);
         //then
-        assertEquals("You need to specify Time", result);
+        assertThrows(IncompleteDataException.class, () -> manager.addVisit(fourthVisit));
     }
 
     @Test
@@ -196,9 +196,8 @@ class VisitManagerTest {
                 .pin("1245")
                 .build();
         //when
-        String result = manager.addVisit(fourthVisit);
         //then
-        assertEquals("Invalid user Id", result);
+        assertThrows(InvalidCredentialsException.class, () -> manager.addVisit(fourthVisit));
     }
 
     @Test
@@ -234,9 +233,8 @@ class VisitManagerTest {
         when(vetManager.findById(anyLong())).thenReturn(firstVet);
         when(repository.findById(anyLong())).thenThrow(new RuntimeException("Id not found"));
         //when
-        String result = manager.updateVisit(thirdVisit);
         //then
-        assertEquals("No such visit in database", result);
+        assertThrows(ResourceNotFoundException.class, () -> manager.updateVisit(thirdVisit));
     }
 
     @Test
@@ -254,9 +252,8 @@ class VisitManagerTest {
         when(repository.findById(anyLong())).thenReturn(Optional.of(firstVisit));
         when(repository.findAll()).thenReturn(visits);
         //when
-        String result = manager.updateVisit(thirdVisit);
         //then
-        assertEquals("Date is unavailable", result);
+        assertThrows(DataCollisionException.class, ()-> {manager.updateVisit(thirdVisit);});
     }
 
     @Test
@@ -270,9 +267,8 @@ class VisitManagerTest {
                 .pin("4569")
                 .build();
         //when
-        String result = manager.updateVisit(thirdVisit);
         //then
-        assertEquals("You need to choose Vet", result);
+        assertThrows(IncompleteDataException.class, () -> manager.updateVisit(thirdVisit));
     }
 
     @Test
@@ -286,9 +282,8 @@ class VisitManagerTest {
                 .pin("4569")
                 .build();
         //when
-        String result = manager.updateVisit(thirdVisit);
         //then
-        assertEquals("You need to specify date", result);
+        assertThrows(IncompleteDataException.class, () -> manager.updateVisit(thirdVisit));
     }
 
     @Test
@@ -302,9 +297,8 @@ class VisitManagerTest {
                 .pin("4569")
                 .build();
         //when
-        String result = manager.updateVisit(thirdVisit);
         //then
-        assertEquals("You need to specify Time", result);
+        assertThrows(IncompleteDataException.class, () -> manager.updateVisit(thirdVisit));
     }
 
     @Test
@@ -319,9 +313,8 @@ class VisitManagerTest {
                 .pin("9999999")
                 .build();
         //when
-        String result = manager.updateVisit(thirdVisit);
         //then
-        assertEquals("Invalid Pin", result);
+        assertThrows(InvalidCredentialsException.class, () -> manager.updateVisit(thirdVisit));
     }
 
     @Test
@@ -336,9 +329,8 @@ class VisitManagerTest {
                 .pin("1324")
                 .build();
         //when
-        String result = manager.updateVisit(thirdVisit);
         //then
-        assertEquals("Invalid user Id", result);
+        assertThrows(InvalidCredentialsException.class, () -> manager.updateVisit(thirdVisit));
     }
 
     @Test
@@ -396,9 +388,8 @@ class VisitManagerTest {
                 .build();
         when(vetManager.findById(anyLong())).thenReturn(firstVet);
         //when
-        String result = manager.deleteVisit(thirdVisit);
         //then
-        assertEquals("No such visit in database", result);
+        assertThrows(ResourceNotFoundException.class, () -> manager.deleteVisit(thirdVisit));
     }
 
     @Test
@@ -413,9 +404,8 @@ class VisitManagerTest {
                 .pin("1234")
                 .build();
         //when
-        String result = manager.deleteVisit(thirdVisit);
         //then
-        assertEquals("Invalid user Id", result);
+        assertThrows(InvalidCredentialsException.class, () -> manager.deleteVisit(thirdVisit));
     }
 
     @Test
@@ -430,9 +420,8 @@ class VisitManagerTest {
                 .pin("12545")
                 .build();
         //when
-        String result = manager.deleteVisit(thirdVisit);
         //then
-        assertEquals("Invalid Pin", result);
+        assertThrows(InvalidCredentialsException.class, () -> manager.deleteVisit(thirdVisit));
     }
     //endregion
 }

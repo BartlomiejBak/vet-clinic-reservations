@@ -2,6 +2,10 @@ package pl.bartekbak.vetclinicreservations.manager;
 
 import org.springframework.stereotype.Service;
 import pl.bartekbak.vetclinicreservations.entity.Visit;
+import pl.bartekbak.vetclinicreservations.exceptions.DataCollisionException;
+import pl.bartekbak.vetclinicreservations.exceptions.IncompleteDataException;
+import pl.bartekbak.vetclinicreservations.exceptions.InvalidCredentialsException;
+import pl.bartekbak.vetclinicreservations.exceptions.ResourceNotFoundException;
 import pl.bartekbak.vetclinicreservations.repository.VisitRepository;
 
 import java.time.LocalDate;
@@ -26,7 +30,7 @@ public class VisitManager {
         if (result.isPresent()) {
             visit = result.get();
         } else {
-            throw new RuntimeException("Id not found");
+            throw new ResourceNotFoundException("Id not found");
         }
         return visit;
     }
@@ -36,7 +40,15 @@ public class VisitManager {
     }
 
     public List<Visit> findVisitsOfVetInDate(Long vetId, LocalDate date) {
+        List<Visit> visits = findVisitsOfVetInDateRaw(vetId, date);
+        if (visits.isEmpty()) {
+            throw new ResourceNotFoundException("No visits in date");
+        } else {
+            return visits;
+        }
+    }
 
+    private List<Visit> findVisitsOfVetInDateRaw(Long vetId, LocalDate date) {
         return repository.findAll().stream()
                 .filter(visit -> visit.getVet().getId().equals(vetId))
                 .filter(visit -> visit.getDate().isEqual(date))
@@ -47,10 +59,8 @@ public class VisitManager {
         //check if data is complete
         String dataCompletion = validateVisitData(visit);
         if (!dataCompletion.equals("")) return dataCompletion;
-
         //check if date is available
-        if (checkIfBusy(visit)) return "Date is unavailable";
-
+        if (checkIfBusy(visit)) throw new DataCollisionException("Date is unavailable");
         repository.save(visit);
         return "Successfully created";
     }
@@ -60,9 +70,9 @@ public class VisitManager {
         String dataCompletion = validateVisitData(visit);
         if (!dataCompletion.isEmpty()) return dataCompletion;
         //check if visit exist
-        if (!checkIfVisitIdExist(visit)) return "No such visit in database";
+        if (!checkIfVisitIdExist(visit)) throw new ResourceNotFoundException("No such visit in database");
         //check if date is available
-        if (checkIfBusy(visit)) return "Date is unavailable";
+        if (checkIfBusy(visit)) throw new DataCollisionException("Date is unavailable");
         repository.save(visit);
         return "Successfully updated";
     }
@@ -72,15 +82,14 @@ public class VisitManager {
         String dataCompletion = validateVisitData(visit);
         if (!dataCompletion.isEmpty()) return dataCompletion;
         //check if exist
-        if (checkIfVisitIdExist(visit)) {
-            repository.delete(visit);
-            return "Successfully deleted";
-        }
-        return "No such visit in database";
+        if (!checkIfVisitIdExist(visit)) throw new ResourceNotFoundException("No such visit in database");
+        repository.delete(visit);
+        return "Successfully deleted";
     }
 
     private boolean checkIfBusy(Visit newVisit) {
-        List<Visit> visitsFiltered = findVisitsOfVetInDate(newVisit.getVet().getId(), newVisit.getDate())
+
+        List<Visit> visitsFiltered = findVisitsOfVetInDateRaw(newVisit.getVet().getId(), newVisit.getDate())
                 .stream()
                 .filter(visit -> timeCollision(newVisit, visit))
                 .filter(visit -> !visit.getId().equals(newVisit.getId()))
@@ -103,12 +112,12 @@ public class VisitManager {
     }
 
     private String validateVisitData(Visit visit) {
-        if (visit.getVet() == null) return "You need to choose Vet";
-        if (visit.getDate() == null) return "You need to specify date";
-        if (visit.getTime() == null) return "You need to specify Time";
-        if (visit.getPin() == null || !validatePin(visit)) return "Invalid Pin";
-        if (visit.getCustomerId() == null || !CustomerIdExist(visit)) return "Invalid user Id";
-        if (!checkIfVetExist(visit)) return "No such vet in database";
+        if (visit.getVet() == null) throw new IncompleteDataException("You need to choose Vet");
+        if (visit.getDate() == null) throw new IncompleteDataException("You need to specify date");
+        if (visit.getTime() == null) throw new IncompleteDataException("You need to specify Time");
+        if (visit.getPin() == null || !validatePin(visit)) throw new InvalidCredentialsException("Invalid Pin");
+        if (visit.getCustomerId() == null || !CustomerIdExist(visit)) throw new InvalidCredentialsException("Invalid user Id");
+        if (!checkIfVetExist(visit)) throw new ResourceNotFoundException("No such vet in database");
 
         return "";
     }

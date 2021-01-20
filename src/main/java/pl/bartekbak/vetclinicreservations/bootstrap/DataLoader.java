@@ -22,7 +22,7 @@ public class DataLoader implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         int count = vetManager.findAll().size();
         if (count == 0) loadData();
     }
@@ -44,15 +44,15 @@ public class DataLoader implements CommandLineRunner {
                 .vet(firstVet)
                 .customerId("5000")
                 .pin("6000")
-                .date(LocalDate.of(2021, 02, 11))
-                .time(LocalTime.of(12, 00))
+                .date(LocalDate.of(2021, 2, 11))
+                .time(LocalTime.of(12, 0))
                 .build();
         Visit bVisit = Visit.builder()
                 .id(101L)
                 .vet(firstVet)
                 .customerId("5001")
                 .pin("6001")
-                .date(LocalDate.of(2021, 02, 11))
+                .date(LocalDate.of(2021, 2, 11))
                 .time(LocalTime.of(12, 20))
                 .build();
         Visit cVisit = Visit.builder()
@@ -60,7 +60,7 @@ public class DataLoader implements CommandLineRunner {
                 .vet(firstVet)
                 .customerId("5002")
                 .pin("6002")
-                .date(LocalDate.of(2021, 02, 11))
+                .date(LocalDate.of(2021, 2, 11))
                 .time(LocalTime.of(12, 40))
                 .build();
         Visit dVisit = Visit.builder()
@@ -68,15 +68,15 @@ public class DataLoader implements CommandLineRunner {
                 .vet(secondVet)
                 .customerId("5003")
                 .pin("6003")
-                .date(LocalDate.of(2021, 02, 11))
-                .time(LocalTime.of(12, 00))
+                .date(LocalDate.of(2021, 2, 11))
+                .time(LocalTime.of(12, 0))
                 .build();
         Visit eVisit = Visit.builder()
                 .id(104L)
                 .vet(secondVet)
                 .customerId("5004")
                 .pin("6004")
-                .date(LocalDate.of(2021, 02, 11))
+                .date(LocalDate.of(2021, 2, 11))
                 .time(LocalTime.of(12, 20))
                 .build();
         Visit fVisit = Visit.builder()
@@ -84,7 +84,7 @@ public class DataLoader implements CommandLineRunner {
                 .vet(secondVet)
                 .customerId("5005")
                 .pin("6005")
-                .date(LocalDate.of(2021, 02, 11))
+                .date(LocalDate.of(2021, 2, 11))
                 .time(LocalTime.of(12, 40))
                 .build();
 

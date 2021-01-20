@@ -11,7 +11,7 @@ import java.util.List;
 @RequestMapping("/api/visits")
 public class VisitApi {
 
-    private VisitManager manager;
+    private final VisitManager manager;
 
     public VisitApi(VisitManager manager) {
         this.manager = manager;

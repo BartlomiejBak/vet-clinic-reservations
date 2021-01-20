@@ -9,7 +9,7 @@ import java.util.List;
 @Service
 public class VetManager {
 
-    private VetRepository repository;
+    private final VetRepository repository;
 
     public VetManager(VetRepository repository) {
         this.repository = repository;

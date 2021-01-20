@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class VisitManager {
-    private VisitRepository repository;
-    private VetManager vetManager;
+    private final VisitRepository repository;
+    private final VetManager vetManager;
 
     public VisitManager(VisitRepository repository, VetManager vetManager) {
         this.repository = repository;
@@ -22,7 +22,7 @@ public class VisitManager {
 
     public Visit findById(Long id) {
         Optional<Visit> result = repository.findById(id);
-        Visit visit = null;
+        Visit visit;
         if (result.isPresent()) {
             visit = result.get();
         } else {
@@ -38,7 +38,7 @@ public class VisitManager {
     public List<Visit> findVisitsOfVetInDate(Long vetId, LocalDate date) {
 
         return repository.findAll().stream()
-                .filter(visit -> visit.getVet().getId() == vetId)
+                .filter(visit -> visit.getVet().getId().equals(vetId))
                 .filter(visit -> visit.getDate().isEqual(date))
                 .collect(Collectors.toList());
     }
@@ -49,7 +49,7 @@ public class VisitManager {
         if (!dataCompletion.equals("")) return dataCompletion;
 
         //check if date is available
-        if (!checkAvailability(visit)) return "Date is unavailable";
+        if (checkIfBusy(visit)) return "Date is unavailable";
 
         repository.save(visit);
         return "Successfully created";
@@ -62,7 +62,7 @@ public class VisitManager {
         //check if visit exist
         if (!checkIfVisitIdExist(visit)) return "No such visit in database";
         //check if date is available
-        if (!checkAvailability(visit)) return "Date is unavailable";
+        if (checkIfBusy(visit)) return "Date is unavailable";
         repository.save(visit);
         return "Successfully updated";
     }
@@ -79,14 +79,14 @@ public class VisitManager {
         return "No such visit in database";
     }
 
-    private boolean checkAvailability(Visit newVisit) {
+    private boolean checkIfBusy(Visit newVisit) {
         List<Visit> visitsFiltered = findVisitsOfVetInDate(newVisit.getVet().getId(), newVisit.getDate())
                 .stream()
-                .filter(visit -> timeCollision(newVisit, visit) == true)
-                .filter(visit -> visit.getId() != newVisit.getId())
+                .filter(visit -> timeCollision(newVisit, visit))
+                .filter(visit -> !visit.getId().equals(newVisit.getId()))
                 .collect(Collectors.toList());
 
-        return visitsFiltered.isEmpty();
+        return !visitsFiltered.isEmpty();
     }
 
     private boolean timeCollision(Visit newVisit, Visit oldVisit) {

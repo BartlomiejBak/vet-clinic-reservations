@@ -42,27 +42,24 @@ public class VisitManager {
 
         //check if date is available
         if (checkAvailability(visit)) {
-            vetManager.addVisit(visit);
             repository.save(visit);
             return "Successfully created";
-        } else {
-            return "Date is unavailable";
         }
+        return "Date is unavailable";
     }
 
     public String updateVisit(Visit visit) {
         //check if data is complete
-
+        String dataCompletion = validateVisitData(visit, true);
+        if (!dataCompletion.isEmpty()) return dataCompletion;
+        //check if visit exist
+        if (!checkIfVisitIdExist(visit)) return "No such visit in database";
         //check if date is available
-
-        //validate id and pin
-
-        //add to Vet
-
-        //add to Customer
-
-        repository.save(visit);
-        return "Successfully updated";
+        if (checkAvailability(visit)) {
+            repository.save(visit);
+            return "Successfully created";
+        }
+        return "Date is unavailable";
     }
 
     public String deleteVisitById(Long id) {

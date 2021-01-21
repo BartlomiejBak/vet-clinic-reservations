@@ -77,6 +77,7 @@ public class VisitManager {
 
     public String deleteVisit(Visit visit) {
         //check if credentials are complete
+        if (visit.getId() == null) throw new IncompleteDataException("You need to specify visit id");
         checkCredentials(visit);
         //check if exist
         if (visitIdNotExist(visit)) throw new ResourceNotFoundException("No such visit in database");

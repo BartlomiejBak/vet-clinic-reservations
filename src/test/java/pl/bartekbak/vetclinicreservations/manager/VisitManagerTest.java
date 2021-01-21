@@ -366,7 +366,6 @@ class VisitManagerTest {
                 .pin("1234")
                 .build();
         doNothing().when(repository).delete(any(Visit.class));
-        when(vetManager.findById(anyLong())).thenReturn(firstVet);
         when(repository.findById(anyLong())).thenReturn(Optional.of(thirdVisit));
         //when
         String result = manager.deleteVisit(thirdVisit);
@@ -386,7 +385,6 @@ class VisitManagerTest {
                 .time(LocalTime.of(12, 40))
                 .pin("1234")
                 .build();
-        when(vetManager.findById(anyLong())).thenReturn(firstVet);
         //when
         //then
         assertThrows(ResourceNotFoundException.class, () -> manager.deleteVisit(thirdVisit));

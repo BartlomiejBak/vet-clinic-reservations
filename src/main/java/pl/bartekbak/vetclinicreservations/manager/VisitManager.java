@@ -57,8 +57,7 @@ public class VisitManager {
 
     public String addVisit(Visit visit) {
         //check if data is complete
-        String dataCompletion = validateVisitData(visit);
-        if (!dataCompletion.equals("")) return dataCompletion;
+        validateVisitData(visit);
         //check if date is available
         if (checkIfBusy(visit)) throw new DataCollisionException("Date is unavailable");
         repository.save(visit);
@@ -67,10 +66,9 @@ public class VisitManager {
 
     public String updateVisit(Visit visit) {
         //check if data is complete
-        String dataCompletion = validateVisitData(visit);
-        if (!dataCompletion.isEmpty()) return dataCompletion;
+        validateVisitData(visit);
         //check if visit exist
-        if (!checkIfVisitIdExist(visit)) throw new ResourceNotFoundException("No such visit in database");
+        if (visitIdNotExist(visit)) throw new ResourceNotFoundException("No such visit in database");
         //check if date is available
         if (checkIfBusy(visit)) throw new DataCollisionException("Date is unavailable");
         repository.save(visit);
@@ -78,11 +76,10 @@ public class VisitManager {
     }
 
     public String deleteVisit(Visit visit) {
-        //check if data is complete
-        String dataCompletion = validateVisitData(visit);
-        if (!dataCompletion.isEmpty()) return dataCompletion;
+        //check if credentials are complete
+        checkCredentials(visit);
         //check if exist
-        if (!checkIfVisitIdExist(visit)) throw new ResourceNotFoundException("No such visit in database");
+        if (visitIdNotExist(visit)) throw new ResourceNotFoundException("No such visit in database");
         repository.delete(visit);
         return "Successfully deleted";
     }
@@ -111,31 +108,33 @@ public class VisitManager {
                 || newStart.equals(oldStart) || newEnd.equals(oldEnd);
     }
 
-    private String validateVisitData(Visit visit) {
-        if (visit.getVet() == null) throw new IncompleteDataException("You need to choose Vet");
+    private void validateVisitData(Visit visit) {
+        if (visit.getVet() == null) throw new IncompleteDataException("You need to choose vet");
         if (visit.getDate() == null) throw new IncompleteDataException("You need to specify date");
-        if (visit.getTime() == null) throw new IncompleteDataException("You need to specify Time");
-        if (visit.getPin() == null || !validatePin(visit)) throw new InvalidCredentialsException("Invalid Pin");
-        if (visit.getCustomerId() == null || !CustomerIdExist(visit)) throw new InvalidCredentialsException("Invalid user Id");
+        if (visit.getTime() == null) throw new IncompleteDataException("You need to specify time");
+        checkCredentials(visit);
         if (!checkIfVetExist(visit)) throw new ResourceNotFoundException("No such vet in database");
-
-        return "";
     }
 
-    private boolean validatePin(Visit visit) {
+    private void checkCredentials(Visit visit) {
+        if (visit.getPin() == null || !pinMatchesPattern(visit)) throw new InvalidCredentialsException("Invalid Pin");
+        if (visit.getCustomerId() == null || !customerIdMatchesPattern(visit)) throw new InvalidCredentialsException("Invalid user Id");
+    }
+
+    private boolean pinMatchesPattern(Visit visit) {
         return visit.getPin().matches("^[0-9]{4}$");
     }
 
-    private boolean CustomerIdExist(Visit visit) {
+    private boolean customerIdMatchesPattern(Visit visit) {
         return visit.getCustomerId().matches("^[0-9]{4}$");
     }
 
-    private boolean checkIfVisitIdExist(Visit visit) {
+    private boolean visitIdNotExist(Visit visit) {
         try {
             findById(visit.getId());
-            return true;
-        } catch (RuntimeException e) {
             return false;
+        } catch (RuntimeException e) {
+            return true;
         }
     }
 

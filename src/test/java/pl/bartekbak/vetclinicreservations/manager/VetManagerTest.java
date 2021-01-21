@@ -107,14 +107,4 @@ class VetManagerTest {
         verify(repository, times(1)).save(thirdVet);
     }
 
-    @Test
-    void deleteVetById_shouldInvokeDeleteOnce() {
-        //given
-        doNothing().when(repository).deleteById(anyLong());
-        //when
-        manager.deleteVetById(1L);
-        //then
-        verify(repository, times(1)).deleteById(1L);
-    }
-
 }

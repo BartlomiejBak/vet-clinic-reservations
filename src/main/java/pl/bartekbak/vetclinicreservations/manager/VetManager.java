@@ -36,8 +36,4 @@ public class VetManager {
         return repository.save(vet);
     }
 
-    public void deleteVetById(Long id) {
-        repository.deleteById(id);
-    }
-
 }

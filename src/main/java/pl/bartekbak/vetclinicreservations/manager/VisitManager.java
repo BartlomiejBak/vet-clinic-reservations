@@ -56,30 +56,23 @@ public class VisitManager {
     }
 
     public String addVisit(Visit visit) {
-        //check if data is complete
         validateVisitData(visit);
-        //check if date is available
         if (checkIfBusy(visit)) throw new DataCollisionException("Date is unavailable");
         repository.save(visit);
         return "Successfully created";
     }
 
     public String updateVisit(Visit visit) {
-        //check if data is complete
         validateVisitData(visit);
-        //check if visit exist
         if (visitIdNotExist(visit)) throw new ResourceNotFoundException("No such visit in database");
-        //check if date is available
         if (checkIfBusy(visit)) throw new DataCollisionException("Date is unavailable");
         repository.save(visit);
         return "Successfully updated";
     }
 
     public String deleteVisit(Visit visit) {
-        //check if credentials are complete
         if (visit.getId() == null) throw new IncompleteDataException("You need to specify visit id");
         checkCredentials(visit);
-        //check if exist
         if (visitIdNotExist(visit)) throw new ResourceNotFoundException("No such visit in database");
         repository.delete(visit);
         return "Successfully deleted";
